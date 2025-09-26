@@ -1,54 +1,124 @@
 "use client";
 import { useState } from "react";
+import { UserService } from "@/features/users/userService";
 
-export default function InviteForm() {
-  const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("EDITOR");
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState("");
+export default function InviteForm({ onUserCreated }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: 'EDITOR',
+    password: ''
+  });
 
-  async function invite() {
-    setBusy(true); setMsg("");
-    const res = await fetch("/api/invite", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email, role })
-    }).then(r => r.json());
-    setBusy(false);
-    if (res?.ok) {
-      setMsg("Invite sent. Check smtp4dev.");
-      setEmail("");
-    } else {
-      setMsg(res?.error || "Failed to send invite.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const result = await UserService.createUser(formData);
+      
+      if (result.success) {
+        setFormData({ name: '', email: '', role: 'USER', password: '' });
+        setIsOpen(false);
+        
+        // Call callback to refresh user list
+        if (onUserCreated) {
+          onUserCreated(result.data);
+        }
+        
+        alert('User created successfully!');
+      }
+    } catch (error) {
+      console.error('Error creating user:', error);
+      alert(error.message || 'Failed to create user');
+    } finally {
+      setLoading(false);
     }
-  }
-
-  if (!open) {
-    return (
-      <button onClick={() => setOpen(true)} className="px-3 py-2 border rounded-lg bg-gray-900 text-white">
-        + Invite
-      </button>
-    );
-  }
+  };
 
   return (
-    <div className="border rounded-xl p-4 shadow">
-      <div className="grid gap-2 sm:grid-cols-3">
-        <input className="border rounded-lg px-3 py-2" placeholder="email@example.com" value={email} onChange={e=>setEmail(e.target.value)} />
-        <select className="border rounded-lg px-3 py-2" value={role} onChange={e=>setRole(e.target.value)}>
-          <option>EDITOR</option>
-          <option>VIEWER</option>
-          <option>ADMIN</option>
-        </select>
-        <div className="flex gap-2">
-          <button disabled={busy} onClick={invite} className="flex-1 px-3 py-2 border rounded-lg bg-gray-900 text-white">
-            {busy ? "Sending..." : "Send invite"}
-          </button>
-          <button onClick={() => setOpen(false)} className="px-3 py-2 border rounded-lg">Close</button>
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+      >
+        Add User
+      </button>
+
+      {isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
+            <h2 className="text-lg font-semibold mb-4">Create New User</h2>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Password</label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                  minLength={6}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Role</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="EDITOR">Editor</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {loading ? 'Creating...' : 'Create User'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-      {msg && <div className="text-xs text-gray-700 mt-2">{msg}</div>}
-    </div>
+      )}
+    </>
   );
 }

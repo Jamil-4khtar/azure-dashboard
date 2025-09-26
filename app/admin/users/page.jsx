@@ -1,61 +1,165 @@
 "use client";
-import InviteForm from "./InviteForm";
 import { useEffect, useState } from "react";
-import SignOutButton from "@/features/Auth/SignOutButton";
 import { useAuth } from "@/features/Auth/AuthContext";
+import { UserService } from "@/features/users/userService";
+import SignOutButton from "@/features/Auth/SignOutButton";
+import InviteForm from "./InviteForm";
+import UserTable from "./components/UserTable";
+import UserFilters from "./components/UserFilters";
+import Pagination from "./components/Pagination";
+import UserStats from "./components/UserStats";
 
 export default function UsersPage() {
   const { user } = useAuth();
-  // if (!session) redirect("/login?callbackUrl=/admin/users");
-  if (user?.role !== "ADMIN") redirect("/admin");
+	console.log(user)
 
-  const [users, setUsers] = useState(null);
+  // Redirect if not admin
+  // if (user?.role !== "ADMIN") {
+		
+  //   if (typeof window !== "undefined") {
+  //     window.location.href = "/admin";
+  //   }
+  //   return null;
+  // }
 
-  useEffect(() => {
-    async function getUsers() {
-      const res = await prisma.user.findMany({
-        orderBy: { createdAt: "desc" },
-      });
-      setUsers(res);
+  const [users, setUsers] = useState([]);
+  const [pagination, setPagination] = useState({});
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 10,
+    search: "",
+    role: "",
+    status: "",
+  });
+
+  // Fetch users
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const result = await UserService.getAllUsers(filters);
+
+      if (result.success) {
+        setUsers(result.data);
+        setPagination(result.pagination);
+      } else {
+        setError("Failed to fetch users");
+      }
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError(err.message || "Failed to fetch users");
+    } finally {
+      setLoading(false);
     }
-    getUsers();
-  }, []);
+  };
+
+  // Fetch user statistics
+  const fetchStats = async () => {
+    try {
+      const result = await UserService.getUserStats();
+      if (result.success) {
+        setStats(result.data);
+      }
+    } catch (err) {
+      console.error("Error fetching user stats:", err);
+    }
+  };
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchUsers();
+    fetchStats();
+  }, [filters]);
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  // Handle pagination
+  const handlePageChange = (page) => {
+    setFilters((prev) => ({ ...prev, page }));
+  };
+
+  // Handle user updates
+  const handleUserUpdate = (updatedUser) => {
+    setUsers((prev) =>
+      prev.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+    );
+    fetchStats(); // Refresh stats
+  };
+
+  // Handle user deletion
+  const handleUserDelete = (deletedUserId) => {
+    setUsers((prev) => prev.filter((user) => user.id !== deletedUserId));
+    fetchStats(); // Refresh stats
+
+    // If this was the last user on the page, go to previous page
+    if (users.length === 1 && filters.page > 1) {
+      setFilters((prev) => ({ ...prev, page: prev.page - 1 }));
+    }
+  };
+
+  if (loading && users.length === 0) {
+    return (
+      <main className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Loading users...</div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="p-6 space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Users</h1>
-        <InviteForm />
-        <SignOutButton />
+        <h1 className="text-2xl font-bold">Users Management</h1>
+        <div className="flex items-center space-x-4">
+          <InviteForm />
+          <SignOutButton />
+        </div>
       </div>
 
-      <table className="w-full text-sm border rounded-lg overflow-hidden">
-        <thead className="bg-gray-600">
-          <tr>
-            <th className="text-left p-2 border-b">Email</th>
-            <th className="text-left p-2 border-b">Name</th>
-            <th className="text-left p-2 border-b">Role</th>
-            <th className="text-left p-2 border-b">Verified</th>
-            <th className="text-left p-2 border-b">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users &&
-            users.map((u) => (
-              <tr key={u.id} className="">
-                <td className="p-2 border-b">{u.email}</td>
-                <td className="p-2 border-b">{u.name || "-"}</td>
-                <td className="p-2 border-b">{u.role}</td>
-                <td className="p-2 border-b">
-                  {u.emailVerified ? "Yes" : "No"}
-                </td>
-                <td className="p-2 border-b">
-                  {u.isActive ? "Active" : "Disabled"}
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+
+      {/* User Statistics */}
+      {stats && <UserStats stats={stats} />}
+
+      {/* Filters */}
+      <UserFilters filters={filters} onFilterChange={handleFilterChange} />
+
+      {/* Users Table */}
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-lg">Loading...</div>
+        </div>
+      ) : users.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">
+          No users found matching your criteria.
+        </div>
+      ) : (
+        <>
+          <UserTable
+            users={users}
+            onUserUpdate={handleUserUpdate}
+            onUserDelete={handleUserDelete}
+          />
+
+          {/* Pagination */}
+          <Pagination pagination={pagination} onPageChange={handlePageChange} />
+        </>
+      )}
     </main>
   );
 }
