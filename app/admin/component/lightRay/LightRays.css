@@ -1,0 +1,16 @@
+.light-rays-container {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	pointer-events: none;
+	z-index: -999;
+	overflow: hidden;
+}
+
+:root {
+	--rays-bg: #fce77245
+}
+
+html[data-theme = "dark"] {
+	--rays-bg: #0a0e1af6
+}
