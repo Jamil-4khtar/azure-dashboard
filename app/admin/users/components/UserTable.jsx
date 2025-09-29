@@ -7,6 +7,7 @@ export default function UserTable({ users, onUserUpdate, onUserDelete }) {
 
   const handleToggleStatus = async (userId) => {
     setLoading(userId);
+		console.log(userId)
     try {
       const result = await UserService.toggleUserStatus(userId);
       onUserUpdate(result.data);
@@ -51,24 +52,24 @@ export default function UserTable({ users, onUserUpdate, onUserDelete }) {
             <th className="text-left p-3 border-b font-medium">Role</th>
             <th className="text-left p-3 border-b font-medium">Status</th>
             <th className="text-left p-3 border-b font-medium">Created</th>
-            <th className="text-left p-3 border-b font-medium">Last Login</th>
+            {/* <th className="text-left p-3 border-b font-medium">Last Login</th> */}
             <th className="text-center p-3 border-b font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+            <tr key={user?.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
               <td className="p-3 border-b">
-                <div className="font-medium">{user.name || 'N/A'}</div>
+                <div className="font-medium">{user?.name || 'N/A'}</div>
               </td>
-              <td className="p-3 border-b">{user.email}</td>
+              <td className="p-3 border-b">{user?.email}</td>
               <td className="p-3 border-b">
                 <span className={`px-2 py-1 text-xs rounded-full ${
-                  user.role === 'ADMIN' 
+                  user?.role === 'ADMIN' 
                     ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' 
                     : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
                 }`}>
-                  {user.role}
+                  {user?.role}
                 </span>
               </td>
               <td className="p-3 border-b">
@@ -77,15 +78,15 @@ export default function UserTable({ users, onUserUpdate, onUserDelete }) {
                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
                     : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
                 }`}>
-                  {user.isActive ? 'Active' : 'Inactive'}
+                  {user?.isActive ? 'Active' : 'Inactive'}
                 </span>
               </td>
               <td className="p-3 border-b text-gray-600 dark:text-gray-300">
-                {formatDate(user.createdAt)}
+                {formatDate(user?.createdAt)}
               </td>
-              <td className="p-3 border-b text-gray-600 dark:text-gray-300">
+              {/* <td className="p-3 border-b text-gray-600 dark:text-gray-300">
                 {user.lastLoginAt ? formatDate(user.lastLoginAt) : 'Never'}
-              </td>
+              </td> */}
               <td className="p-3 border-b">
                 <div className="flex items-center justify-center space-x-2">
                   <button

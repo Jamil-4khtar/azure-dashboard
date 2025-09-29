@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/features/Auth/AuthContext";
 import { UserService } from "@/features/users/userService";
 import SignOutButton from "@/features/Auth/SignOutButton";
-import InviteForm from "./InviteForm";
+import InviteForm from "./components/inviteUser/InviteForm";
 import UserTable from "./components/UserTable";
 import UserFilters from "./components/UserFilters";
 import Pagination from "./components/Pagination";
 import UserStats from "./components/UserStats";
+import InviteContainer from "./components/inviteUser/InviteContainer";
 
 export default function UsersPage() {
   const { user } = useAuth();
@@ -86,6 +87,18 @@ export default function UsersPage() {
     setFilters((prev) => ({ ...prev, page }));
   };
 
+	// Handle new user creation - THIS IS THE CALLBACK FUNCTION
+  const handleUserCreated = (newUser) => {
+    // Option 1: Add the new user to the current list (if it fits the current filters)
+    setUsers(prev => [newUser, ...prev]);
+    
+    // Option 2: Or simply refresh the entire list and stats
+    // fetchUsers();
+    
+    // Always refresh stats to show updated counts
+    fetchStats();
+  };
+
   // Handle user updates
   const handleUserUpdate = (updatedUser) => {
     setUsers((prev) =>
@@ -121,7 +134,11 @@ export default function UsersPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Users Management</h1>
         <div className="flex items-center space-x-4">
-          <InviteForm />
+          <InviteContainer 
+						loading={loading}
+						setLoading={setLoading}
+						onUserCreated={handleUserCreated}
+					/>
           <SignOutButton />
         </div>
       </div>
