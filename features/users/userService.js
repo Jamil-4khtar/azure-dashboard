@@ -13,7 +13,6 @@ const getAuthHeaders = () => {
 
 console.log(getAuthHeaders());
 
-
 export class UserService {
   static async getAllUsers(params = {}) {
     const queryParams = new URLSearchParams();
@@ -66,48 +65,74 @@ export class UserService {
     return response.json();
   }
 
-	static async createUser(userData) {
-    const response = await fetch(`${API_BASE_URL}/users`, {
-      method: 'POST',
+  static async inviteUser(email, role) {
+    const response = await fetch(`${API_BASE_URL}/invite`, {
+      method: "POST",
       headers: getAuthHeaders(),
-      credentials: 'include',
+      credentials: "include",
+      body: JSON.stringify({ email, role }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
+        throw new Error("Authentication required");
+      }
+
+      // Handle specific error messages from the backend
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || `Failed to send invitation: ${response.statusText}`
+      );
+    }
+
+    return response.json();
+  }
+
+  static async createUser(userData) {
+    const response = await fetch(`${API_BASE_URL}/users`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      credentials: "include",
       body: JSON.stringify(userData),
     });
 
     if (!response.ok) {
       if (response.status === 401) {
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
-        throw new Error('Authentication required');
+        throw new Error("Authentication required");
       }
-      
+
       // Handle validation errors
       if (response.status === 409) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'User already exists');
+        throw new Error(errorData.message || "User already exists");
       }
-      
+
       throw new Error(`Failed to create user: ${response.statusText}`);
     }
 
     return response.json();
   }
 
-	static async updateUser(id, userData) {
+  static async updateUser(id, userData) {
     const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: getAuthHeaders(),
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify(userData),
     });
 
     if (!response.ok) {
       if (response.status === 401) {
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
-        throw new Error('Authentication required');
+        throw new Error("Authentication required");
       }
       throw new Error(`Failed to update user: ${response.statusText}`);
     }
@@ -115,19 +140,19 @@ export class UserService {
     return response.json();
   }
 
-	static async deleteUser(id) {
+  static async deleteUser(id) {
     const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: getAuthHeaders(),
-      credentials: 'include',
+      credentials: "include",
     });
 
     if (!response.ok) {
       if (response.status === 401) {
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
-        throw new Error('Authentication required');
+        throw new Error("Authentication required");
       }
       throw new Error(`Failed to delete user: ${response.statusText}`);
     }
@@ -135,19 +160,19 @@ export class UserService {
     return response.json();
   }
 
-	static async toggleUserStatus(id) {
+  static async toggleUserStatus(id) {
     const response = await fetch(`${API_BASE_URL}/users/${id}/toggle-status`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: getAuthHeaders(),
-      credentials: 'include',
+      credentials: "include",
     });
 
     if (!response.ok) {
       if (response.status === 401) {
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
-        throw new Error('Authentication required');
+        throw new Error("Authentication required");
       }
       throw new Error(`Failed to toggle user status: ${response.statusText}`);
     }
@@ -155,25 +180,23 @@ export class UserService {
     return response.json();
   }
 
-	static async getUserStats() {
+  static async getUserStats() {
     const response = await fetch(`${API_BASE_URL}/users/stats`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
-      credentials: 'include',
+      credentials: "include",
     });
 
     if (!response.ok) {
       if (response.status === 401) {
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
-        throw new Error('Authentication required');
+        throw new Error("Authentication required");
       }
       throw new Error(`Failed to fetch user stats: ${response.statusText}`);
     }
 
     return response.json();
   }
-
-
 }

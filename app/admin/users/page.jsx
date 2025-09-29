@@ -15,13 +15,13 @@ export default function UsersPage() {
 	console.log(user)
 
   // Redirect if not admin
-  // if (user?.role !== "ADMIN") {
+  if (user?.role !== "ADMIN") {
 		
-  //   if (typeof window !== "undefined") {
-  //     window.location.href = "/admin";
-  //   }
-  //   return null;
-  // }
+    if (typeof window !== "undefined") {
+      window.location.href = "/admin";
+    }
+    return null;
+  }
 
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({});

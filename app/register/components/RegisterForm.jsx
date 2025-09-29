@@ -1,4 +1,4 @@
-import { useAuth } from "../hooks/useRegister";
+import { useRegister } from "../hooks/useRegister";
 import Input from "@/components/inputs/Input";
 import Button from "@/components/buttons/Button";
 import { useToast } from "@/features/Toast/ToastProvider";
@@ -14,7 +14,7 @@ export default function RegisterForm() {
     isSubmitting,
     onSubmit,
     msg,
-  } = useAuth();
+  } = useRegister();
 
   const { showToast } = useToast();
 

@@ -31,11 +31,14 @@ export function useRegister() {
       return;
     }
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ invite, name, password }),
-    }).then((r) => r.json());
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ invite, name, password }),
+      }
+    ).then((r) => r.json());
     setIsSubmitting(false);
     if (res?.ok) {
       setMsg("Account created. You can sign in now.");
