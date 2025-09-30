@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useToast } from "@/features/Toast/ToastProvider";
 
 export function useRegister() {
   const params = useSearchParams();
@@ -10,6 +11,7 @@ export function useRegister() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
+	const {showToast} = useToast(); 
 
   const callbackUrl = decodeURIComponent(params.get("callbackUrl") || "/admin");
 
@@ -31,21 +33,37 @@ export function useRegister() {
       return;
     }
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ invite, name, password }),
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ token: invite, name, password }), // Changed 'invite' to 'token' to match backend
+        }
+      );
+
+      const data = await response.json();
+      setIsSubmitting(false);
+
+      if (response.ok) {
+        // Check response.ok, not data.ok
+        setMsg("Account created. You can sign in now.");
+        setTimeout(() => router.push("/login"), 1200);
+      } else {
+        setError(data?.error || "Registration failed.");
       }
-    ).then((r) => r.json());
-    setIsSubmitting(false);
-    if (res?.ok) {
-      setMsg("Account created. You can sign in now.");
-      setTimeout(() => router.push("/login"), 1200);
-    } else {
-      setError(res?.error || "Registration failed.");
+    } catch (error) {
+      setIsSubmitting(false);
+      setError("Network error. Please try again.");
     }
+  }
+
+	if (error) {
+    setTimeout(() => {
+      showToast(error);
+      setError("");
+    }, 500);
   }
 
   const resetForm = () => {
