@@ -36,7 +36,7 @@ export default function ForgotPassword() {
     e?.preventDefault?.();
     setBusy(true);
     setInfo("");
-    await fetch("/api/auth/forgot-password", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-passwor`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ email }),
