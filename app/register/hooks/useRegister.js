@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useToast } from "@/features/Toast/ToastProvider";
+import { register } from "next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup";
 
 export function useRegister() {
   const params = useSearchParams();
@@ -11,7 +12,7 @@ export function useRegister() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
-	const {showToast} = useToast(); 
+  const { showToast } = useToast();
 
   const callbackUrl = decodeURIComponent(params.get("callbackUrl") || "/admin");
 
@@ -34,32 +35,21 @@ export function useRegister() {
     }
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ token: invite, name, password }), // Changed 'invite' to 'token' to match backend
-        }
-      );
-
-      const data = await response.json();
-      setIsSubmitting(false);
-
-      if (response.ok) {
-        // Check response.ok, not data.ok
+      const response = await register(invite, name, password);
+      if (response.success) {
         setMsg("Account created. You can sign in now.");
         setTimeout(() => router.push("/login"), 1200);
       } else {
-        setError(data?.error || "Registration failed.");
+        setError(response.error || "Registration failed.");
       }
     } catch (error) {
-      setIsSubmitting(false);
       setError("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
-	if (error) {
+  if (error) {
     setTimeout(() => {
       showToast(error);
       setError("");

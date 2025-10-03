@@ -92,12 +92,12 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (invite, name, password) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ invite, name, password }),
+        body: JSON.stringify({ token: invite, name, password }), // Changed 'invite' to 'token' to match backend
       });
 
       const data = await response.json();
