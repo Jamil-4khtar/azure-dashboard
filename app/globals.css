@@ -46,7 +46,7 @@
   --fs-24: 1.5rem;
   --lh: 1.5;
 
-  
+  --logo-filter: brightness(0);
 }
 
 /* 2.2 — Dark mode overrides */
@@ -68,6 +68,7 @@ html[data-theme="dark"] {
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
   --shadow-md: 0 6px 16px rgba(0,0,0,0.45);
 
+	--logo-filter: invert(1) brightness(1);
   
 }
 

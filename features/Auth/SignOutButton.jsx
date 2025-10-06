@@ -1,14 +1,22 @@
-"use client";
+"use client"
+
+import { HiOutlineLogout } from "react-icons/hi";
 import { useAuth } from "./AuthContext";
 
-export default function SignOutButton() {
+export default function SignOutButton({ className = "", showIcon = true }) {
   const { signOut } = useAuth();
+
+  const handleSignOut = () => {
+    signOut();
+  };
+
   return (
     <button
-      onClick={() => signOut()}
-      className="px-3 py-2 border rounded-lg cursor-pointer"
+      onClick={handleSignOut}
+      className={`flex items-center space-x-2 text-sm font-medium transition-colors ${className}`}
     >
-      Sign out
+      {showIcon && <HiOutlineLogout className="w-4 h-4" />}
+      <span>Sign out</span>
     </button>
   );
 }
