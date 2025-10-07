@@ -1,23 +1,31 @@
 "use client";
 import { useState } from "react";
+import { HiOutlineUserAdd, HiOutlineMail } from "react-icons/hi";
 import InviteForm from "./InviteForm";
 import InviteModal from "./InviteModal";
 import { UserService } from "@/features/users/userService";
 
-export default function InviteContainer({ onUserCreated }) {
+export default function InviteContainer({ onUserCreated, loading, setLoading }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [formData, setFormData] = useState({
     email: "",
     role: "EDITOR",
+    name: "",
   });
 
-  const handleOpen = () => setIsOpen(true);
+  const handleOpen = () => {
+    setIsOpen(true);
+    setError(null);
+    setSuccess(null);
+  };
+
   const handleClose = () => {
     setIsOpen(false);
     setError(null);
-    setFormData({ email: "", role: "EDITOR" });
+    setSuccess(null);
+    setFormData({ email: "", role: "EDITOR", name: "" });
   };
 
   const handleSubmit = async (e) => {
@@ -28,18 +36,26 @@ export default function InviteContainer({ onUserCreated }) {
     try {
       const result = await UserService.inviteUser(
         formData.email,
-        formData.role
+        formData.role,
+        formData.name
       );
 
       if (result.success) {
-        // You can use the onUserCreated callback to show a success message
-        // or update a list of pending invitations.
+        setSuccess("Invitation sent successfully!");
         onUserCreated({
           email: formData.email,
           role: formData.role,
+          name: formData.name,
           status: "INVITED",
+          id: result.data?.id || Date.now(),
+          isActive: false,
+          createdAt: new Date().toISOString(),
         });
-        handleClose();
+        
+        // Close modal after 1.5 seconds
+        setTimeout(() => {
+          handleClose();
+        }, 1500);
       } else {
         setError(result.message || "Failed to send invitation.");
       }
@@ -51,29 +67,84 @@ export default function InviteContainer({ onUserCreated }) {
   };
 
   return (
-    <div>
+    <>
       <button
         onClick={handleOpen}
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        className="flex items-center bg-[var(--primary)] text-[var(--primary-contrast)] space-x-2 px-4 py-2 rounded-lg transition-colors font-medium"
+        
       >
-        + Invite User
+        <HiOutlineUserAdd className="w-4 h-4" />
+        <span>Invite User</span>
       </button>
 
       <InviteModal isOpen={isOpen} onClose={handleClose}>
-        <h2 className="text-xl font-bold mb-4">Invite New User</h2>
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+        <div className="space-y-4">
+          {/* Header */}
+          <div className="flex items-center space-x-3">
+            <div
+              className="p-2 rounded-lg"
+              style={{ backgroundColor: "var(--primary)/10" }}
+            >
+              <HiOutlineMail
+                className="w-6 h-6"
+                style={{ color: "var(--primary)" }}
+              />
+            </div>
+            <div>
+              <h2
+                className="text-xl font-bold"
+                style={{ color: "var(--text)" }}
+              >
+                Invite New User
+              </h2>
+              <p
+                className="text-sm"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Send an invitation to join your team
+              </p>
+            </div>
           </div>
-        )}
-        <InviteForm
-          onSubmit={handleSubmit}
-          onCancel={handleClose}
-          formData={formData}
-          setFormData={setFormData}
-          loading={loading}
-        />
+
+          {/* Success Message */}
+          {success && (
+            <div
+              className="p-4 rounded-lg border flex items-center space-x-2"
+              style={{
+                backgroundColor: "var(--success)/10",
+                borderColor: "var(--success)/20",
+                color: "var(--success)",
+              }}
+            >
+              <HiOutlineMail className="w-5 h-5" />
+              <span>{success}</span>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {error && (
+            <div
+              className="p-4 rounded-lg border"
+              style={{
+                backgroundColor: "var(--error)/10",
+                borderColor: "var(--error)/20",
+                color: "var(--error)",
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          {/* Form */}
+          <InviteForm
+            onSubmit={handleSubmit}
+            onCancel={handleClose}
+            formData={formData}
+            setFormData={setFormData}
+            loading={loading}
+          />
+        </div>
       </InviteModal>
-    </div>
+    </>
   );
 }

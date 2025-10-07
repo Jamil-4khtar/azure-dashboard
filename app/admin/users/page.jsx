@@ -2,21 +2,22 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/features/Auth/AuthContext";
 import { UserService } from "@/features/users/userService";
-import SignOutButton from "@/features/Auth/SignOutButton";
-import InviteForm from "./components/inviteUser/InviteForm";
+import DashboardHeader from "../component/DashboardHeader";
+import InviteContainer from "./components/inviteUser/InviteContainer";
 import UserTable from "./components/UserTable";
 import UserFilters from "./components/UserFilters";
 import Pagination from "./components/Pagination";
 import UserStats from "./components/UserStats";
-import InviteContainer from "./components/inviteUser/InviteContainer";
+import {
+  HiOutlineUsers,
+  HiOutlineRefresh,
+} from "react-icons/hi";
 
 export default function UsersPage() {
   const { user } = useAuth();
-	console.log(user)
 
   // Redirect if not admin
   if (user?.role !== "ADMIN") {
-		
     if (typeof window !== "undefined") {
       window.location.href = "/admin";
     }
@@ -28,6 +29,7 @@ export default function UsersPage() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [filters, setFilters] = useState({
     page: 1,
@@ -71,6 +73,13 @@ export default function UsersPage() {
     }
   };
 
+  // Refresh data
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([fetchUsers(), fetchStats()]);
+    setRefreshing(false);
+  };
+
   // Initial data fetch
   useEffect(() => {
     fetchUsers();
@@ -87,15 +96,9 @@ export default function UsersPage() {
     setFilters((prev) => ({ ...prev, page }));
   };
 
-	// Handle new user creation - THIS IS THE CALLBACK FUNCTION
+  // Handle new user creation
   const handleUserCreated = (newUser) => {
-    // Option 1: Add the new user to the current list (if it fits the current filters)
-    setUsers(prev => [newUser, ...prev]);
-    
-    // Option 2: Or simply refresh the entire list and stats
-    // fetchUsers();
-    
-    // Always refresh stats to show updated counts
+    setUsers((prev) => [newUser, ...prev]);
     fetchStats();
   };
 
@@ -104,79 +107,186 @@ export default function UsersPage() {
     setUsers((prev) =>
       prev.map((user) => (user.id === updatedUser.id ? updatedUser : user))
     );
-    fetchStats(); // Refresh stats
+    fetchStats();
   };
 
   // Handle user deletion
   const handleUserDelete = (deletedUserId) => {
     setUsers((prev) => prev.filter((user) => user.id !== deletedUserId));
-    fetchStats(); // Refresh stats
+    fetchStats();
 
-    // If this was the last user on the page, go to previous page
     if (users.length === 1 && filters.page > 1) {
       setFilters((prev) => ({ ...prev, page: prev.page - 1 }));
     }
   };
 
-  if (loading && users.length === 0) {
-    return (
-      <main className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg">Loading users...</div>
+  return (
+    <div className="min-h-screen">
+      {/* Header */}
+      <DashboardHeader />
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        {/* Page Header */}
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center space-x-3">
+              <div
+                className="p-2 rounded-lg"
+                style={{ backgroundColor: "var(--primary)/10" }}
+              >
+                <HiOutlineUsers
+                  className="w-6 h-6"
+                  style={{ color: "var(--primary)" }}
+                />
+              </div>
+              <div>
+                <h1
+                  className="text-2xl md:text-3xl font-bold"
+                  style={{ color: "var(--text)" }}
+                >
+                  Users Management
+                </h1>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Manage your team members and their permissions
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="flex items-center space-x-2 px-4 py-2 border rounded-lg transition-colors disabled:opacity-50"
+                style={{
+                  borderColor: "var(--border)",
+                  color: "var(--text-muted)",
+                  backgroundColor: "var(--surface)",
+                }}
+              >
+                <HiOutlineRefresh
+                  className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
+                />
+                <span>Refresh</span>
+              </button>
+
+              <InviteContainer
+                loading={loading}
+                setLoading={setLoading}
+                onUserCreated={handleUserCreated}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div
+            className="mb-6 p-4 rounded-lg border"
+            style={{
+              backgroundColor: "var(--error)/10",
+              borderColor: "var(--error)/20",
+              color: "var(--error)",
+            }}
+          >
+            <div className="flex items-center space-x-2">
+              <span className="font-medium">Error:</span>
+              <span>{error}</span>
+            </div>
+          </div>
+        )}
+
+        {/* User Statistics */}
+        {stats && (
+          <div className="mb-6 md:mb-8">
+            <UserStats stats={stats} />
+          </div>
+        )}
+
+        {/* Filters */}
+        <div className="mb-6">
+          <UserFilters filters={filters} onFilterChange={handleFilterChange} />
+        </div>
+
+        {/* Users Content */}
+        <div
+          className="rounded-lg border overflow-hidden bg-[var(--surface)]/50"
+          style={{
+            borderColor: "var(--border)",
+          }}
+        >
+          {loading && users.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div
+                  className="inline-block w-8 h-8 border-2 border-current border-t-transparent rounded-full animate-spin mb-3"
+                  style={{ color: "var(--primary)" }}
+                ></div>
+                <div style={{ color: "var(--text-muted)" }}>
+                  Loading users...
+                </div>
+              </div>
+            </div>
+          ) : users.length === 0 ? (
+            <div className="text-center py-12">
+              <HiOutlineUsers
+                className="w-12 h-12 mx-auto mb-4"
+                style={{ color: "var(--text-muted)" }}
+              />
+              <h3
+                className="text-lg font-medium mb-2"
+                style={{ color: "var(--text)" }}
+              >
+                No users found
+              </h3>
+              <p style={{ color: "var(--text-muted)" }}>
+                {filters.search || filters.role || filters.status
+                  ? "No users match your current filters."
+                  : "Get started by inviting your first team member."}
+              </p>
+            </div>
+          ) : (
+            <>
+              <UserTable
+                users={users}
+                onUserUpdate={handleUserUpdate}
+                onUserDelete={handleUserDelete}
+                loading={loading}
+              />
+
+              {/* Pagination */}
+              {pagination.totalPages > 1 && (
+                <div
+                  className="px-6 py-4 border-t"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <Pagination
+                    pagination={pagination}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Footer Info */}
+        <div
+          className="mt-6 text-center text-sm"
+          style={{ color: "var(--text-muted)" }}
+        >
+          {users.length > 0 && (
+            <p>
+              Showing {(pagination.currentPage - 1) * filters.limit + 1} to{" "}
+              {Math.min(pagination.currentPage * filters.limit, pagination.total)}
+              {" "}of {pagination.total} users
+            </p>
+          )}
         </div>
       </main>
-    );
-  }
-
-  return (
-    <main className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Users Management</h1>
-        <div className="flex items-center space-x-4">
-          <InviteContainer 
-						loading={loading}
-						setLoading={setLoading}
-						onUserCreated={handleUserCreated}
-					/>
-          <SignOutButton />
-        </div>
-      </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      )}
-
-      {/* User Statistics */}
-      {stats && <UserStats stats={stats} />}
-
-      {/* Filters */}
-      <UserFilters filters={filters} onFilterChange={handleFilterChange} />
-
-      {/* Users Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-lg">Loading...</div>
-        </div>
-      ) : users.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          No users found matching your criteria.
-        </div>
-      ) : (
-        <>
-          <UserTable
-            users={users}
-            onUserUpdate={handleUserUpdate}
-            onUserDelete={handleUserDelete}
-          />
-
-          {/* Pagination */}
-          <Pagination pagination={pagination} onPageChange={handlePageChange} />
-        </>
-      )}
-    </main>
+    </div>
   );
 }

@@ -77,7 +77,7 @@ export default function PagesTable({
   }
 
   return (
-    <div className="overflow-x-auto border-[var(--border)]">
+    <div className="rounded-lg border overflow-x-auto bg-[var(--surface)]/50 border-[var(--border)]">
       <table className="w-full ">
         <thead className="bg-[var(--bg-muted)]/80 border-b border-[var(--border)]">
           <tr>

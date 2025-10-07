@@ -113,8 +113,10 @@ export default function PagesManagement() {
         page.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
         page.author.name.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesStatus = statusFilter === "all" || page.status === statusFilter;
-      const matchesAuthor = authorFilter === "all" || page.author.name === authorFilter;
+      const matchesStatus =
+        statusFilter === "all" || page.status === statusFilter;
+      const matchesAuthor =
+        authorFilter === "all" || page.author.name === authorFilter;
 
       return matchesSearch && matchesStatus && matchesAuthor;
     });
@@ -171,7 +173,7 @@ export default function PagesManagement() {
   return (
     <div className="min-h-screen">
       <DashboardHeader />
-      
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Page Header */}
         <div className="mb-6">
@@ -185,7 +187,7 @@ export default function PagesManagement() {
                 Create, edit, and manage your website pages
               </p>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Link
                 href="/admin/pages/new"
@@ -200,19 +202,20 @@ export default function PagesManagement() {
 
         {/* Components will be rendered here */}
         <PageStats pages={pages} />
-        <SearchAndFilters 
+        <SearchAndFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           statusFilter={statusFilter}
           setStatusFilter={setStatusFilter}
           authorFilter={authorFilter}
           setAuthorFilter={setAuthorFilter}
+          setDateFilter={setDateFilter}
         />
-        
+
         {selectedPages.length > 0 && (
-          <BulkActions 
+          <BulkActions
             selectedCount={selectedPages.length}
-            onBulkAction={(action) => console.log('Bulk action:', action)}
+            onBulkAction={(action) => console.log("Bulk action:", action)}
           />
         )}
 
