@@ -2,10 +2,10 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthLayout from "../login/components/AuthLayout";
-import Input from "@/components/inputs/Input";
-import StyledLink from "@/components/links/StyledLink";
-import Button from "@/components/buttons/Button";
-import { useToast } from "@/features/Toast/ToastProvider";
+import Input from "@/components/ui/inputs/Input";
+import StyledLink from "@/components/ui/links/StyledLink";
+import Button from "@/components/ui/buttons/Button";
+import { useToast } from "@/components/ui/Toast/ToastProvider";
 
 export default function ResetPassword() {
   const params = useSearchParams();
@@ -22,11 +22,14 @@ export default function ResetPassword() {
     setBusy(true);
     setErr("");
     setMsg("");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ token, password }),
-    }).then((r) => r.json());
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token, password }),
+      }
+    ).then((r) => r.json());
     setBusy(false);
     if (res?.ok) {
       setMsg("Password updated. You can now sign in.");
@@ -73,7 +76,7 @@ export default function ResetPassword() {
             </div>
           )}
           {msg && <div className="text-xs text-green-700">{msg}</div>}
-          
+
           <Button loading={busy} type="submit">
             {busy ? "Updating..." : "Update password"}
           </Button>

@@ -1,13 +1,13 @@
-"use client"
+"use client";
 import { useContext, useCallback, createContext, useState } from "react";
-import { Toast } from "../../components/Toast/Toast";
+import { Toast } from "./Toast";
 
 const ToastContext = createContext(null);
 
 export const useToast = () => {
   const context = useContext(ToastContext);
   if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
+    throw new Error("useToast must be used within a ToastProvider");
   }
   return context;
 };
@@ -15,7 +15,7 @@ export const useToast = () => {
 export const ToastProvider = ({ children }) => {
   const [toastConfig, setToastConfig] = useState(null);
 
-  const showToast = useCallback((message, type = 'error') => {
+  const showToast = useCallback((message, type = "error") => {
     setToastConfig({ message, type });
   }, []);
 

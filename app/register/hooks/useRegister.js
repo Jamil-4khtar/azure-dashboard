@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useToast } from "@/features/Toast/ToastProvider";
+import { useToast } from "@/components/ui/Toast/ToastProvider";
 import { register } from "next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup";
 
 export function useRegister() {

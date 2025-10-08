@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useToast } from "@/features/Toast/ToastProvider";
+import { useToast } from "@/components/ui/Toast/ToastProvider";
 import { useAuth as useAuthContext } from "@/features/Auth/AuthContext";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 export function useLogin() {
   const params = useSearchParams();
@@ -26,7 +27,6 @@ export function useLogin() {
     setMsg("");
 
     try {
-      
       // Use the context's signIn method (calls your Node.js backend)
       const result = await signIn(email, password);
 

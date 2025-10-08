@@ -1,8 +1,6 @@
 "use client";
 import { useLogin } from "../hooks/useLogin";
-import Input from "@/components/inputs/Input";
-import StyledLink from "@/components/links/StyledLink";
-import Button from "@/components/buttons/Button";
+import { Input, Button, StyledLink } from "@/components/ui";
 
 export default function LoginForm() {
   const {
@@ -31,7 +29,9 @@ export default function LoginForm() {
       aria-labelledby="loginTitle"
       onSubmit={handleLogin}
     >
-      <h1 id="loginTitle" className="m-0 mb-3.5 text-xl font-bold">Login</h1>
+      <h1 id="loginTitle" className="m-0 mb-3.5 text-xl font-bold">
+        Login
+      </h1>
       <Input
         type="email"
         label={"Email"}
@@ -48,10 +48,7 @@ export default function LoginForm() {
         placeholder="Enter your password"
         required
       />
-      <StyledLink
-        href="/forgot-password"
-        className="text-sm font-light"
-      >
+      <StyledLink href="/forgot-password" className="text-sm font-light">
         Forgot Password?
       </StyledLink>
       <Button type="submit" loading={isSubmitting}>

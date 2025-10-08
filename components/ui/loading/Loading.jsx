@@ -3,7 +3,7 @@ import React from "react";
 import Image from "next/image";
 
 
-function AuthLoading() {
+function Loading() {
   
   return (
     <>
@@ -49,4 +49,4 @@ function AuthLoading() {
   );
 }
 
-export default AuthLoading;
+export default Loading;

@@ -1,4 +1,4 @@
-import { ToastProvider } from "@/features/Toast/ToastProvider";
+import { ToastProvider } from "@/components/ui";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/features/Auth/AuthContext";

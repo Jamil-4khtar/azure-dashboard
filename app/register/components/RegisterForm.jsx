@@ -1,7 +1,7 @@
 import { useRegister } from "../hooks/useRegister";
-import Input from "@/components/inputs/Input";
-import Button from "@/components/buttons/Button";
-import { useToast } from "@/features/Toast/ToastProvider";
+import Input from "@/components/ui/inputs/Input";
+import Button from "@/components/ui/buttons/Button";
+import { useToast } from "@/components/ui/Toast/ToastProvider";
 
 export default function RegisterForm() {
   const {
@@ -58,8 +58,6 @@ export default function RegisterForm() {
       <Button type="submit" loading={isSubmitting}>
         {isSubmitting ? "Signing..." : "Sign Up"}
       </Button>
-
-      
     </form>
   );
 }

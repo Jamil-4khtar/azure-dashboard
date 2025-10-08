@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { HiMail } from "react-icons/hi";
-import Input from "@/components/inputs/Input";
-import Button from "@/components/buttons/Button";
-import StyledLink from "@/components/links/StyledLink";
+import Input from "@/components/ui/inputs/Input";
+import Button from "@/components/ui/buttons/Button";
+import StyledLink from "@/components/ui/links/StyledLink";
 import AuthLayout from "../login/components/AuthLayout";
 
 const DEFAULT_COOLDOWN = 60; // seconds, only for initial UX; server is authoritative
@@ -79,9 +79,11 @@ export default function ForgotPassword() {
   return (
     <div className="flex h-screen justify-center items-center">
       <AuthLayout />
-      <div className="lg:w-[600px] lg:px-10 lg:py-20 space-6 bg-black/10 shadow-2xl border-1 w border-[var(--border)] rounded-4xl space-y-5
+      <div
+        className="lg:w-[600px] lg:px-10 lg:py-20 space-6 bg-black/10 shadow-2xl border-1 w border-[var(--border)] rounded-4xl space-y-5
       zoomInLess
-      ">
+      "
+      >
         <div className="text-center">
           <h2 className="text-4xl font-bold tracking-tighter">
             {sent ? "Check Your Email" : "Forgot Password"}
