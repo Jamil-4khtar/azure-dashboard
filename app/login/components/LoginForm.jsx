@@ -8,20 +8,9 @@ export default function LoginForm() {
     setEmail,
     password,
     setPassword,
-    error,
-    setError,
     isSubmitting,
     handleLogin,
   } = useLogin();
-
-  // const { showToast } = useToast();
-
-  // if (error) {
-  //   setTimeout(() => {
-  //     showToast(error);
-  //     setError("");
-  //   }, 500);
-  // }
 
   return (
     <form

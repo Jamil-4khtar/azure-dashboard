@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect } from 'react';
-// Step 1: Import icons from react-icons
 import { IoIosCloseCircle, IoMdClose } from 'react-icons/io';
 
 export const Toast = ({ message, type = 'error', onClose }) => {
