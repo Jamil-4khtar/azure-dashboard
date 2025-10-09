@@ -94,10 +94,10 @@ export default function UsersPage() {
   };
 
   // Handle new user creation
-  const handleUserCreated = (newUser) => {
-    setUsers((prev) => [newUser, ...prev]);
-    fetchStats();
-  };
+  // const handleUserCreated = (newUser) => {
+  //   setUsers((prev) => [newUser, ...prev]);
+  //   fetchStats();
+  // };
 
   // Handle user updates
   const handleUserUpdate = (updatedUser) => {
@@ -170,7 +170,7 @@ export default function UsersPage() {
               <InviteContainer
                 loading={loading}
                 setLoading={setLoading}
-                onUserCreated={handleUserCreated}
+                // onUserCreated={handleUserCreated}
               />
             </div>
           </div>
@@ -277,9 +277,9 @@ export default function UsersPage() {
               Showing {(pagination.currentPage - 1) * filters.limit + 1} to{" "}
               {Math.min(
                 pagination.currentPage * filters.limit,
-                pagination.total
+                pagination.totalPages
               )}{" "}
-              of {pagination.total} users
+              of {pagination.totalUsers} users
             </p>
           )}
         </div>

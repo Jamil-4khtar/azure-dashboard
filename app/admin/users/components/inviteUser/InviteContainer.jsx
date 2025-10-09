@@ -6,7 +6,7 @@ import InviteModal from "./InviteModal";
 import { UserService } from "@/features/users/services/userService";
 
 export default function InviteContainer({
-  onUserCreated,
+  // onUserCreated,
   loading,
   setLoading,
 }) {
@@ -36,6 +36,8 @@ export default function InviteContainer({
     e.preventDefault();
     setLoading(true);
     setError(null);
+		setSuccess(null);
+
 
     try {
       const result = await UserService.inviteUser(
@@ -44,24 +46,15 @@ export default function InviteContainer({
         formData.name
       );
 
-      if (result.success) {
+      if (result.message) {
         setSuccess("Invitation sent successfully!");
-        onUserCreated({
-          email: formData.email,
-          role: formData.role,
-          name: formData.name,
-          status: "INVITED",
-          id: result.data?.id || Date.now(),
-          isActive: false,
-          createdAt: new Date().toISOString(),
-        });
 
         // Close modal after 1.5 seconds
         setTimeout(() => {
           handleClose();
         }, 1500);
       } else {
-        setError(result.message || "Failed to send invitation.");
+        setError(result.error || "Failed to send invitation.");
       }
     } catch (err) {
       setError(err.message || "An unexpected error occurred.");
