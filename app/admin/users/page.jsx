@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/features/Auth/AuthContext";
+import { useAuth } from "@/features/Auth/AuthGuard";
 import { UserService } from "@/features/users/userService";
 import DashboardHeader from "../component/DashboardHeader";
 import InviteContainer from "./components/inviteUser/InviteContainer";

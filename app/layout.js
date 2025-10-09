@@ -1,7 +1,6 @@
 import { ToastProvider } from "@/components/ui";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "@/features/Auth/AuthContext";
 import AuthGuard from "@/features/Auth/AuthGuard";
 
 export const metadata = {
@@ -15,13 +14,11 @@ export default function RootLayout({ children }) {
       <body>
         <ThemeProvider>
           <ToastProvider>
-            <AuthProvider>
               <AuthGuard>
                 <div className="h-full flex flex-col">
                   <main className="flex-1">{children}</main>
                 </div>
               </AuthGuard>
-            </AuthProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

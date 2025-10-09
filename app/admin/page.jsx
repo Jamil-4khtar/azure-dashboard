@@ -8,7 +8,7 @@ import {
   HiOutlineClock,
 
 } from "react-icons/hi";
-import { useAuth } from "@/features/Auth/AuthContext";
+import { useAuth } from "@/features/Auth/AuthGuard";
 import StatsCard from "./component/StatsCard";
 import QuickActions from "./component/QuickActions";
 import RecentPages from "./component/RecentPages";

@@ -1,51 +1,110 @@
+// features/Auth/AuthGuard.jsx
 "use client";
-import React from "react";
-import { useAuth } from "./AuthContext";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { authService } from '@/lib/services';
+import Cookies from 'js-cookie';
 
-const AUTH_ROUTES = ["/login", "/register", "/forgot-password"];
-const DEFAULT_PRIVATE_ROUTE = "/admin";
-const DEFAULT_PUBLIC_ROUTE = "/login";
+// Create context for global auth state
+const AuthContext = createContext({});
 
+// Custom hook to use auth state
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthGuard');
+  }
+  return context;
+};
+
+// Combined AuthGuard + Global State Provider
 export default function AuthGuard({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
-  const params = useSearchParams();
 
-  const callbackUrl = decodeURIComponent(params.get("callbackUrl") || "");
-  const isAuthRoute = AUTH_ROUTES.includes(pathname);
+  // Public routes that don't require authentication
+  const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+  const isPublicRoute = publicRoutes.includes(pathname);
 
-  React.useEffect(() => {
-    if (loading) return; // Wait for auth state to load
+  useEffect(() => {
+    initializeAuth();
+  }, []);
 
-    if (isAuthenticated && isAuthRoute) {
-			// Redirect authenticated users away from auth pages
-			console.log("user presenttttt")
-      const redirectTo = callbackUrl && callbackUrl !== "null" 
-        ? callbackUrl 
-        : DEFAULT_PRIVATE_ROUTE;
-      router.push(redirectTo);
+  const initializeAuth = async () => {
+    try {
+      const token = Cookies.get('auth-token');
+      if (token) {
+        const result = await authService.getCurrentUser();
+        if (result.success) {
+          setUser(result.user);
+        } else {
+          // Token invalid, clear it
+          await signOut();
+        }
+      }
+    } catch (error) {
+      console.error('Auth initialization failed:', error);
+      await signOut();
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (!isAuthenticated && !isAuthRoute) {
-			// Redirect unauthenticated users to login
-			console.log("no tokeeeeeeeeeeen")
-      const callbackUrl = encodeURIComponent(pathname);
-      router.push(`${DEFAULT_PUBLIC_ROUTE}?callbackUrl=${callbackUrl}`);
+  const updateUser = (userData) => {
+    setUser(userData);
+  };
+
+  const signOut = async () => {
+    authService.logout();
+    setUser(null);
+    router.push('/login');
+  };
+
+  // Route protection logic
+  useEffect(() => {
+    if (!loading) {
+      if (!user && !isPublicRoute) {
+        // User not authenticated, redirect to login with callback
+        const callbackUrl = encodeURIComponent(pathname);
+        router.push(`/login?callbackUrl=${callbackUrl}`);
+      } else if (user && (pathname === '/login' || pathname === '/register')) {
+        // User authenticated but on auth pages, redirect to dashboard
+        router.push('/admin');
+      }
     }
-  }, [isAuthenticated, loading, pathname, router, isAuthRoute, callbackUrl]);
+  }, [user, loading, pathname, isPublicRoute, router]);
 
-  // Show loading while determining auth state
-  if (loading || 
-      (isAuthenticated && isAuthRoute) || 
-      (!isAuthenticated && !isAuthRoute)) {
+  // Show loading while checking auth
+  if (loading) {
     return (
-      <div className="flex items-center bg-transparent justify-center h-screen">
-        <div>Loading...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
       </div>
     );
   }
 
-  return <>{children}</>;
+  // Prevent flash of protected content
+  if (!user && !isPublicRoute) {
+    return null; // Will redirect
+  }
+
+  // Provide auth context to entire app
+  const authValue = {
+    user,
+    loading,
+    isAuthenticated: !!user,
+    updateUser,
+    signOut,
+  };
+
+  return (
+    <AuthContext.Provider value={authValue}>
+      {children}
+    </AuthContext.Provider>
+  );
 }

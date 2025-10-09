@@ -1,45 +1,38 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useToast } from "@/components/ui/Toast/ToastProvider";
-import { useAuth as useAuthContext } from "@/features/Auth/AuthContext";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+// app/login/hooks/useLogin.js
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "@/components/ui/Toast";
+import { useAuth } from "@/features/Auth/AuthGuard"; // Import from AuthGuard now
+import { authService } from "@/lib/services";
 
 export function useLogin() {
-  const params = useSearchParams();
   const router = useRouter();
-  const { signIn } = useAuthContext();
+  const params = useSearchParams();
+  const { updateUser } = useAuth(); // Get from AuthGuard
+  const { showToast } = useToast();
 
-  // Get and decode callbackUrl from query parameters (if encoded)
   const callbackUrl = decodeURIComponent(params.get("callbackUrl") || "/admin");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [msg, setMsg] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
-    setMsg("");
 
     try {
-      // Use the context's signIn method (calls your Node.js backend)
-      const result = await signIn(email, password);
-
+      const result = await authService.login(email, password);
       if (result.success) {
-        // Redirect to the callback URL (user's original requested page)
-        console.log(callbackUrl);
+        updateUser(result.user); // Update global state
         router.push(callbackUrl);
       } else {
-        if (result.error?.includes("ACCOUNT_DISABLED")) {
-          setError("Your account is disabled. Contact an admin.");
-        } else {
-          setError("Invalid credentials");
-        }
+        const errorMsg = result.error?.includes("ACCOUNT_DISABLED")
+          ? "Your account is disabled. Contact an admin."
+          : "Invalid credentials";
+        setError(errorMsg);
       }
     } catch (err) {
       setError("An error occurred during login");
@@ -48,14 +41,7 @@ export function useLogin() {
     }
   };
 
-  const resetForm = () => {
-    setEmail("");
-    setPassword("");
-    setError("");
-  };
-
-  const { showToast } = useToast();
-
+  // Show toast on error
   if (error) {
     setTimeout(() => {
       showToast(error);
@@ -71,8 +57,5 @@ export function useLogin() {
     error,
     isSubmitting,
     handleLogin,
-    resetForm,
-    setError,
-    msg,
   };
 }

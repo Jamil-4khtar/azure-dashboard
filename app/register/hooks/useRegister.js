@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast/ToastProvider";
-import { register } from "next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup";
+import { useAuth } from "@/features/Auth/AuthContext";
 
 export function useRegister() {
   const params = useSearchParams();
@@ -13,6 +13,7 @@ export function useRegister() {
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const { showToast } = useToast();
+	const { register } = useAuth()
 
   const callbackUrl = decodeURIComponent(params.get("callbackUrl") || "/admin");
 

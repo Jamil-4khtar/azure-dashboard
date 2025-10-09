@@ -1,7 +1,7 @@
 "use client"
 
 import { HiOutlineLogout } from "react-icons/hi";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./AuthGuard";
 
 export default function SignOutButton({ className = "", showIcon = true }) {
   const { signOut } = useAuth();

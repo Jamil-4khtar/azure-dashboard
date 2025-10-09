@@ -8,7 +8,7 @@ import {
   HiOutlineLogout,
   HiOutlineChevronDown
 } from "react-icons/hi";
-import { useAuth } from "@/features/Auth/AuthContext";
+import { useAuth } from "@/features/Auth/AuthGuard"
 import SignOutButton from "@/features/Auth/SignOutButton";
 
 export default function UserDropdown() {
