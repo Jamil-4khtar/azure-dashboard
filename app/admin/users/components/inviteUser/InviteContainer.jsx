@@ -3,9 +3,13 @@ import { useState } from "react";
 import { HiOutlineUserAdd, HiOutlineMail } from "react-icons/hi";
 import InviteForm from "./InviteForm";
 import InviteModal from "./InviteModal";
-import { UserService } from "@/features/users/userService";
+import { UserService } from "@/features/users/services/userService";
 
-export default function InviteContainer({ onUserCreated, loading, setLoading }) {
+export default function InviteContainer({
+  onUserCreated,
+  loading,
+  setLoading,
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -51,7 +55,7 @@ export default function InviteContainer({ onUserCreated, loading, setLoading }) 
           isActive: false,
           createdAt: new Date().toISOString(),
         });
-        
+
         // Close modal after 1.5 seconds
         setTimeout(() => {
           handleClose();
@@ -71,7 +75,6 @@ export default function InviteContainer({ onUserCreated, loading, setLoading }) 
       <button
         onClick={handleOpen}
         className="flex items-center bg-[var(--primary)] text-[var(--primary-contrast)] space-x-2 px-4 py-2 rounded-lg transition-colors font-medium"
-        
       >
         <HiOutlineUserAdd className="w-4 h-4" />
         <span>Invite User</span>
@@ -97,10 +100,7 @@ export default function InviteContainer({ onUserCreated, loading, setLoading }) 
               >
                 Invite New User
               </h2>
-              <p
-                className="text-sm"
-                style={{ color: "var(--text-muted)" }}
-              >
+              <p className="text-sm" style={{ color: "var(--text-muted)" }}>
                 Send an invitation to join your team
               </p>
             </div>

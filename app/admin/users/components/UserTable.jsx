@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { UserService } from "@/features/users/userService";
+import { UserService } from "@/features/users/services/userService";
 import {
   HiOutlineDotsVertical,
   HiOutlineTrash,

@@ -14,7 +14,7 @@ import {
   HiOutlineCode,
   HiOutlineTemplate,
 } from "react-icons/hi";
-import DashboardHeader from "../../component/DashboardHeader";
+import DashboardHeader from "../../../../components/layout/DashboardHeader";
 import PageEditor from "../components/PageEditor";
 import SEOSettings from "../components/SEOSettings";
 import PageSettings from "../components/PageSettings";
@@ -23,7 +23,7 @@ export default function CreatePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("content");
   const [saving, setSaving] = useState(false);
-  
+
   const [pageData, setPageData] = useState({
     title: "",
     slug: "",
@@ -76,16 +76,16 @@ export default function CreatePage() {
         status,
         updatedAt: new Date().toISOString(),
       };
-      
+
       if (status === "published") {
         dataToSave.publishedAt = new Date().toISOString();
       }
-      
+
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      
+
       console.log("Saving page:", dataToSave);
-      
+
       // Redirect to pages list after successful save
       router.push("/admin/pages");
     } catch (error) {
@@ -102,27 +102,27 @@ export default function CreatePage() {
   };
 
   const updatePageData = (updates) => {
-    setPageData(prev => ({ ...prev, ...updates }));
+    setPageData((prev) => ({ ...prev, ...updates }));
   };
 
   const updateSEOData = (seoUpdates) => {
-    setPageData(prev => ({
+    setPageData((prev) => ({
       ...prev,
-      seo: { ...prev.seo, ...seoUpdates }
+      seo: { ...prev.seo, ...seoUpdates },
     }));
   };
 
   const updateSettingsData = (settingsUpdates) => {
-    setPageData(prev => ({
+    setPageData((prev) => ({
       ...prev,
-      settings: { ...prev.settings, ...settingsUpdates }
+      settings: { ...prev.settings, ...settingsUpdates },
     }));
   };
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
       <DashboardHeader />
-      
+
       {/* Sticky Header */}
       <div className="sticky top-16 z-30 bg-[var(--surface)]/80 backdrop-blur-lg border-b border-[var(--border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,7 +136,7 @@ export default function CreatePage() {
               >
                 <HiOutlineArrowLeft className="w-5 h-5" />
               </Link>
-              
+
               <div>
                 <h1 className="text-lg font-semibold text-[var(--text)]">
                   Create New Page
@@ -156,7 +156,7 @@ export default function CreatePage() {
                 <HiOutlineEye className="w-4 h-4" />
                 Preview
               </button>
-              
+
               <button
                 onClick={() => handleSave("draft")}
                 disabled={saving}
@@ -165,7 +165,7 @@ export default function CreatePage() {
                 <HiOutlineSave className="w-4 h-4" />
                 {saving ? "Saving..." : "Save Draft"}
               </button>
-              
+
               <button
                 onClick={() => handleSave("published")}
                 disabled={saving || !pageData.title || !pageData.content}
@@ -203,12 +203,9 @@ export default function CreatePage() {
           {/* Main Content Area */}
           <div className="lg:col-span-2">
             {activeTab === "content" && (
-              <PageEditor
-                pageData={pageData}
-                onUpdate={updatePageData}
-              />
+              <PageEditor pageData={pageData} onUpdate={updatePageData} />
             )}
-            
+
             {activeTab === "seo" && (
               <SEOSettings
                 seoData={pageData.seo}
@@ -216,7 +213,7 @@ export default function CreatePage() {
                 onUpdate={updateSEOData}
               />
             )}
-            
+
             {activeTab === "settings" && (
               <PageSettings
                 settingsData={pageData.settings}
@@ -239,30 +236,42 @@ export default function CreatePage() {
                 >
                   <HiOutlineTemplate className="w-5 h-5 text-[var(--primary)]" />
                   <div>
-                    <div className="font-medium text-[var(--text)]">Choose Template</div>
-                    <div className="text-sm text-[var(--text-muted)]">Select page layout</div>
+                    <div className="font-medium text-[var(--text)]">
+                      Choose Template
+                    </div>
+                    <div className="text-sm text-[var(--text-muted)]">
+                      Select page layout
+                    </div>
                   </div>
                 </button>
-                
+
                 <button
                   onClick={() => console.log("Add media")}
                   className="flex items-center gap-3 w-full p-3 text-left bg-[var(--bg)] rounded-lg hover:bg-[var(--hover)] transition-colors"
                 >
                   <HiOutlinePhotograph className="w-5 h-5 text-[var(--primary)]" />
                   <div>
-                    <div className="font-medium text-[var(--text)]">Add Media</div>
-                    <div className="text-sm text-[var(--text-muted)]">Insert images or files</div>
+                    <div className="font-medium text-[var(--text)]">
+                      Add Media
+                    </div>
+                    <div className="text-sm text-[var(--text-muted)]">
+                      Insert images or files
+                    </div>
                   </div>
                 </button>
-                
+
                 <button
                   onClick={() => console.log("View source")}
                   className="flex items-center gap-3 w-full p-3 text-left bg-[var(--bg)] rounded-lg hover:bg-[var(--hover)] transition-colors"
                 >
                   <HiOutlineCode className="w-5 h-5 text-[var(--primary)]" />
                   <div>
-                    <div className="font-medium text-[var(--text)]">HTML Source</div>
-                    <div className="text-sm text-[var(--text-muted)]">Edit raw HTML</div>
+                    <div className="font-medium text-[var(--text)]">
+                      HTML Source
+                    </div>
+                    <div className="text-sm text-[var(--text-muted)]">
+                      Edit raw HTML
+                    </div>
                   </div>
                 </button>
               </div>
@@ -276,17 +285,25 @@ export default function CreatePage() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-[var(--text-muted)]">Status:</span>
-                  <span className="text-[var(--text)] capitalize">{pageData.status}</span>
+                  <span className="text-[var(--text)] capitalize">
+                    {pageData.status}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[var(--text-muted)]">Word count:</span>
                   <span className="text-[var(--text)]">
-                    {pageData.content.split(/\s+/).filter(word => word.length > 0).length}
+                    {
+                      pageData.content
+                        .split(/\s+/)
+                        .filter((word) => word.length > 0).length
+                    }
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[var(--text-muted)]">Template:</span>
-                  <span className="text-[var(--text)] capitalize">{pageData.template}</span>
+                  <span className="text-[var(--text)] capitalize">
+                    {pageData.template}
+                  </span>
                 </div>
                 {pageData.publishAt && (
                   <div className="flex justify-between">

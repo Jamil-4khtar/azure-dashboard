@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { 
-  HiOutlineUser, 
-  HiOutlineCog, 
+import {
+  HiOutlineUser,
+  HiOutlineCog,
   HiOutlineLogout,
-  HiOutlineChevronDown
+  HiOutlineChevronDown,
 } from "react-icons/hi";
-import { useAuth } from "@/features/Auth/AuthGuard"
-import SignOutButton from "@/features/Auth/SignOutButton";
+import { useAuth } from "@/features/Auth/components/AuthGuard";
+import SignOutButton from "@/features/Auth/components/SignOutButton";
 
 export default function UserDropdown() {
   const { user } = useAuth();
@@ -23,15 +23,15 @@ export default function UserDropdown() {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const userInitial = (user?.name || user?.email)?.charAt(0).toUpperCase();
   const userName = user?.name || user?.email;
-  const userRole = user?.role || 'Admin';
+  const userRole = user?.role || "Admin";
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -40,83 +40,82 @@ export default function UserDropdown() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center space-x-3 text-sm rounded-lg p-2 transition-colors"
         style={{
-          '--hover-bg': 'var(--hover)'
+          "--hover-bg": "var(--hover)",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--hover)';
+          e.currentTarget.style.backgroundColor = "var(--hover)";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.backgroundColor = "transparent";
         }}
       >
-        <div 
+        <div
           className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ backgroundColor: 'var(--primary)' }}
+          style={{ backgroundColor: "var(--primary)" }}
         >
-          <span 
+          <span
             className="text-sm font-medium"
-            style={{ color: 'var(--primary-contrast)' }}
+            style={{ color: "var(--primary-contrast)" }}
           >
             {userInitial}
           </span>
         </div>
         <div className="hidden sm:flex flex-col text-left">
-          <span 
-            className="font-medium"
-            style={{ color: 'var(--text)' }}
-          >
+          <span className="font-medium" style={{ color: "var(--text)" }}>
             {userName}
           </span>
-          <span 
+          <span
             className="capitalize text-xs"
-            style={{ color: 'var(--text-muted)' }}
+            style={{ color: "var(--text-muted)" }}
           >
             {userRole}
           </span>
         </div>
-        <HiOutlineChevronDown 
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          style={{ color: 'var(--text-muted)' }}
+        <HiOutlineChevronDown
+          className={`w-4 h-4 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+          style={{ color: "var(--text-muted)" }}
         />
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div 
+        <div
           className="absolute right-0 mt-2 w-56 rounded-lg border py-2 z-50"
           style={{
-            backgroundColor: 'var(--surface)',
-            borderColor: 'var(--border)',
-            boxShadow: 'var(--shadow-md)'
+            backgroundColor: "var(--surface)",
+            borderColor: "var(--border)",
+            boxShadow: "var(--shadow-md)",
           }}
         >
           {/* User Info Section */}
-          <div 
+          <div
             className="px-4 py-3 border-b"
-            style={{ borderColor: 'var(--border)' }}
+            style={{ borderColor: "var(--border)" }}
           >
             <div className="flex items-center space-x-3">
-              <div 
+              <div
                 className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: 'var(--primary)' }}
+                style={{ backgroundColor: "var(--primary)" }}
               >
-                <span 
+                <span
                   className="font-medium"
-                  style={{ color: 'var(--primary-contrast)' }}
+                  style={{ color: "var(--primary-contrast)" }}
                 >
                   {userInitial}
                 </span>
               </div>
               <div>
-                <p 
+                <p
                   className="text-sm font-medium"
-                  style={{ color: 'var(--text)' }}
+                  style={{ color: "var(--text)" }}
                 >
                   {userName}
                 </p>
-                <p 
+                <p
                   className="text-xs capitalize"
-                  style={{ color: 'var(--text-muted)' }}
+                  style={{ color: "var(--text-muted)" }}
                 >
                   {userRole}
                 </p>
@@ -130,28 +129,28 @@ export default function UserDropdown() {
               href="/admin/profile"
               onClick={() => setIsOpen(false)}
               className="flex items-center px-4 py-2 text-sm transition-colors"
-              style={{ color: 'var(--text)' }}
+              style={{ color: "var(--text)" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--hover)';
+                e.currentTarget.style.backgroundColor = "var(--hover)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.backgroundColor = "transparent";
               }}
             >
               <HiOutlineUser className="w-4 h-4 mr-3" />
               View Profile
             </Link>
-            
+
             <Link
               href="/admin/profile/edit"
               onClick={() => setIsOpen(false)}
               className="flex items-center px-4 py-2 text-sm transition-colors"
-              style={{ color: 'var(--text)' }}
+              style={{ color: "var(--text)" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--hover)';
+                e.currentTarget.style.backgroundColor = "var(--hover)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.backgroundColor = "transparent";
               }}
             >
               <HiOutlineUser className="w-4 h-4 mr-3" />
@@ -162,12 +161,12 @@ export default function UserDropdown() {
               href="/admin/settings/account"
               onClick={() => setIsOpen(false)}
               className="flex items-center px-4 py-2 text-sm transition-colors"
-              style={{ color: 'var(--text)' }}
+              style={{ color: "var(--text)" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--hover)';
+                e.currentTarget.style.backgroundColor = "var(--hover)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.backgroundColor = "transparent";
               }}
             >
               <HiOutlineCog className="w-4 h-4 mr-3" />
@@ -176,28 +175,29 @@ export default function UserDropdown() {
           </div>
 
           {/* Divider */}
-          <div 
+          <div
             className="border-t my-1"
-            style={{ borderColor: 'var(--border)' }}
+            style={{ borderColor: "var(--border)" }}
           ></div>
 
           {/* Sign Out */}
           <div className="py-1">
-            <div 
+            <div
               onClick={() => setIsOpen(false)}
               className="flex items-center px-4 py-2 text-sm cursor-pointer transition-colors"
-              style={{ color: 'var(--error)' }}
+              style={{ color: "var(--error)" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
+                e.currentTarget.style.backgroundColor =
+                  "rgba(220, 38, 38, 0.1)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.backgroundColor = "transparent";
               }}
             >
               <HiOutlineLogout className="w-4 h-4 mr-3" />
-              <SignOutButton 
+              <SignOutButton
                 className=""
-                style={{ color: 'var(--error)' }}
+                style={{ color: "var(--error)" }}
                 showIcon={false}
               />
             </div>

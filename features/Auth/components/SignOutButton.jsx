@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { HiOutlineLogout } from "react-icons/hi";
 import { useAuth } from "./AuthGuard";

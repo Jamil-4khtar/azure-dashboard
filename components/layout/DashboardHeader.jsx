@@ -94,7 +94,7 @@ function DashboardHeader() {
             className="md:hidden fixed inset-0 bg-black/20 z-30"
             onClick={() => setMobileMenuOpen(false)}
           />
-          
+
           {/* Mobile Menu */}
           <div className="md:hidden fixed top-16 left-0 right-0 bg-[var(--surface)] border-t border-[var(--border)] z-40 shadow-lg">
             <nav className="px-4 py-2 space-y-1">

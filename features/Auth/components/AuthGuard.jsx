@@ -2,7 +2,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { authService } from '@/lib/services';
+import { authService } from '../services/authService';
 import Cookies from 'js-cookie';
 
 // Create context for global auth state

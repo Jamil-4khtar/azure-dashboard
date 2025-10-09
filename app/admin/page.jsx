@@ -6,15 +6,14 @@ import {
   HiOutlinePhotograph,
   HiOutlineEye,
   HiOutlineClock,
-
 } from "react-icons/hi";
-import { useAuth } from "@/features/Auth/AuthGuard";
+import { useAuth } from "@/features/Auth/components/AuthGuard";
 import StatsCard from "./component/StatsCard";
 import QuickActions from "./component/QuickActions";
 import RecentPages from "./component/RecentPages";
 import RecentActivity from "./component/RecentActivity";
 import SystemStatus from "./component/SystemStatus";
-import DashboardHeader from "./component/DashboardHeader";
+import DashboardHeader from "../../components/layout/DashboardHeader";
 
 export default function AdminPage() {
   const { user } = useAuth();
@@ -184,8 +183,7 @@ export default function AdminPage() {
       className="min-h-screen"
       // style={{ backgroundColor: 'var(--bg)' }}
     >
-			<DashboardHeader/>
-      
+      <DashboardHeader />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">

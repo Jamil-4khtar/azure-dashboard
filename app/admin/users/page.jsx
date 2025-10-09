@@ -1,17 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/features/Auth/AuthGuard";
-import { UserService } from "@/features/users/userService";
-import DashboardHeader from "../component/DashboardHeader";
+import { useAuth } from "@/features/Auth/components/AuthGuard";
+import { UserService } from "@/features/users/services/userService";
+import DashboardHeader from "../../../components/layout/DashboardHeader";
 import InviteContainer from "./components/inviteUser/InviteContainer";
 import UserTable from "./components/UserTable";
 import UserFilters from "./components/UserFilters";
 import Pagination from "./components/Pagination";
 import UserStats from "./components/UserStats";
-import {
-  HiOutlineUsers,
-  HiOutlineRefresh,
-} from "react-icons/hi";
+import { HiOutlineUsers, HiOutlineRefresh } from "react-icons/hi";
 
 export default function UsersPage() {
   const { user } = useAuth();
@@ -45,17 +42,13 @@ export default function UsersPage() {
       setLoading(true);
       setError(null);
 
-      const result = await UserService.getAllUsers(filters);
-
-      if (result.success) {
-        setUsers(result.data);
-        setPagination(result.pagination);
-      } else {
-        setError("Failed to fetch users");
-      }
+      const res = await UserService.getAllUsers(filters);
+			console.log(res)
+      setUsers(res.data || []);
+      setPagination(res.pagination || {});
     } catch (err) {
       console.error("Error fetching users:", err);
-      setError(err.message || "Failed to fetch users");
+      setError(err?.response?.data?.message || err.message || "Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -64,10 +57,8 @@ export default function UsersPage() {
   // Fetch user statistics
   const fetchStats = async () => {
     try {
-      const result = await UserService.getUserStats();
-      if (result.success) {
-        setStats(result.data);
-      }
+      const res = await UserService.getUserStats();
+      setStats(res.data || res); // Sometimes, backend returns stats directly
     } catch (err) {
       console.error("Error fetching user stats:", err);
     }
@@ -84,6 +75,7 @@ export default function UsersPage() {
   useEffect(() => {
     fetchUsers();
     fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   // Handle filter changes
@@ -147,10 +139,7 @@ export default function UsersPage() {
                 >
                   Users Management
                 </h1>
-                <p
-                  className="text-sm"
-                  style={{ color: "var(--text-muted)" }}
-                >
+                <p className="text-sm" style={{ color: "var(--text-muted)" }}>
                   Manage your team members and their permissions
                 </p>
               </div>
@@ -281,8 +270,11 @@ export default function UsersPage() {
           {users.length > 0 && (
             <p>
               Showing {(pagination.currentPage - 1) * filters.limit + 1} to{" "}
-              {Math.min(pagination.currentPage * filters.limit, pagination.total)}
-              {" "}of {pagination.total} users
+              {Math.min(
+                pagination.currentPage * filters.limit,
+                pagination.total
+              )}{" "}
+              of {pagination.total} users
             </p>
           )}
         </div>

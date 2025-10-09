@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast/ToastProvider";
-import { useAuth } from "@/features/Auth/AuthContext";
+import { useAuth } from "@/features/Auth/components/AuthGuard";
 
 export function useRegister() {
   const params = useSearchParams();

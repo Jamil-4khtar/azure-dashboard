@@ -21,7 +21,7 @@ import {
   HiOutlineX,
   HiOutlineChevronDown,
 } from "react-icons/hi";
-import DashboardHeader from "../component/DashboardHeader";
+import DashboardHeader from "../../../components/layout/DashboardHeader";
 import PageStats from "./components/PageStats";
 import BulkActions from "./components/BulkActions";
 import StatusBadge from "./components/StatusBadge";

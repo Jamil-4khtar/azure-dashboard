@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
-import { useAuth } from "@/features/Auth/AuthGuard"; // Import from AuthGuard now
-import { authService } from "@/lib/services";
+import { useAuth } from "@/features/Auth/components/AuthGuard"; // Import from AuthGuard now
+import { authService } from "@/features/Auth/services/authService";
 
 export function useLogin() {
   const router = useRouter();
