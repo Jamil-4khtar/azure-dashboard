@@ -1,14 +1,50 @@
-// services/userService.js
-import { get, post, put, patch, del } from "@/lib/api/client";
-import { API_ENDPOINTS } from "@/lib/api/endpoints"; // or wherever your constants are
+import { get, post, patch, put, del } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
 
-export const UserService = {
-  getAllUsers: (params = {}) => get(API_ENDPOINTS.USERS.LIST, { params }),
-  getUserById: (id) => get(API_ENDPOINTS.USERS.GET(id)),
-  inviteUser: (email, role) => post(API_ENDPOINTS.AUTH.INVITE, { email, role }),
-  createUser: (userData) => post(API_ENDPOINTS.USERS.CREATE, userData),
-  updateUser: (id, userData) => put(API_ENDPOINTS.USERS.UPDATE(id), userData),
-  deleteUser: (id) => del(API_ENDPOINTS.USERS.DELETE(id)),
-  toggleUserStatus: (id) => patch(`/users/${id}/toggle-status`),
-  getUserStats: () => get("/users/stats"),
-};
+// UserService uses apiClient and endpoints
+export class UserService {
+  static async getAllUsers(params = {}) {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append("page", params.page);
+    if (params.limit) queryParams.append("limit", params.limit);
+    if (params.search) queryParams.append("search", params.search);
+    if (params.role) queryParams.append("role", params.role);
+    if (params.status) queryParams.append("status", params.status);
+
+    return get(
+      `${API_ENDPOINTS.USERS.LIST}?${queryParams.toString()}`
+    );
+  }
+
+  static async getUserById(id) {
+    return get(API_ENDPOINTS.USERS.GET(id));
+  }
+
+  static async inviteUser(email, role) {
+    return post(API_ENDPOINTS.AUTH.INVITE, { email, role });
+  }
+
+  static async createUser(userData) {
+    return post(API_ENDPOINTS.USERS.CREATE, userData);
+  }
+
+  static async updateUser(id, userData) {
+    return put(API_ENDPOINTS.USERS.UPDATE(id), userData);
+  }
+
+  static async deleteUser(id) {
+    return del(API_ENDPOINTS.USERS.DELETE(id));
+  }
+
+  static async toggleUserStatus(id) {
+    // Assuming PATCH for status toggle, may need endpoint update
+    return patch(`/users/${id}/toggle-status`);
+  }
+
+  static async getUserStats() {
+    // Replace with API_ENDPOINTS if defined
+    return get("/users/stats");
+  }
+}
+
+export default UserService;

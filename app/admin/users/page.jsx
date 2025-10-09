@@ -42,13 +42,17 @@ export default function UsersPage() {
       setLoading(true);
       setError(null);
 
-      const res = await UserService.getAllUsers(filters);
-			console.log(res)
-      setUsers(res.data || []);
-      setPagination(res.pagination || {});
+      const result = await UserService.getAllUsers(filters);
+
+      if (result.success) {
+        setUsers(result.data);
+        setPagination(result.pagination);
+      } else {
+        setError("Failed to fetch users");
+      }
     } catch (err) {
       console.error("Error fetching users:", err);
-      setError(err?.response?.data?.message || err.message || "Failed to fetch users");
+      setError(err.message || "Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -57,8 +61,10 @@ export default function UsersPage() {
   // Fetch user statistics
   const fetchStats = async () => {
     try {
-      const res = await UserService.getUserStats();
-      setStats(res.data || res); // Sometimes, backend returns stats directly
+      const result = await UserService.getUserStats();
+      if (result.success) {
+        setStats(result.data);
+      }
     } catch (err) {
       console.error("Error fetching user stats:", err);
     }
@@ -75,7 +81,6 @@ export default function UsersPage() {
   useEffect(() => {
     fetchUsers();
     fetchStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   // Handle filter changes
