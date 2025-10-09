@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useToast } from "@/components/ui/Toast/ToastProvider";
-import { useAuth } from "@/features/Auth/components/AuthGuard";
+import { useToast } from "@/components/ui/Toast";
+import { authService } from "@/features/Auth/services/authService";
 
 export function useRegister() {
   const params = useSearchParams();
@@ -13,7 +13,6 @@ export function useRegister() {
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const { showToast } = useToast();
-	const { register } = useAuth()
 
   const callbackUrl = decodeURIComponent(params.get("callbackUrl") || "/admin");
 
@@ -36,7 +35,7 @@ export function useRegister() {
     }
 
     try {
-      const response = await register(invite, name, password);
+      const response = await authService.register(invite, name, password);
       if (response.success) {
         setMsg("Account created. You can sign in now.");
         setTimeout(() => router.push("/login"), 1200);

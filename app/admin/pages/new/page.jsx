@@ -120,7 +120,7 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg)]">
+    <div className="min-h-screen">
       <DashboardHeader />
 
       {/* Sticky Header */}

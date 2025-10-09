@@ -2,6 +2,7 @@ import { ToastProvider } from "@/components/ui";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import AuthGuard from "@/features/Auth/components/AuthGuard";
+import DashboardBg from "@/components/layout/DashboardBg";
 
 export const metadata = {
   title: "Create Next App",
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
           <ToastProvider>
             <AuthGuard>
               <div className="h-full flex flex-col">
+                <DashboardBg/>
                 <main className="flex-1">{children}</main>
               </div>
             </AuthGuard>

@@ -1,10 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { HiMail } from "react-icons/hi";
-import Input from "@/components/ui/inputs/Input";
-import Button from "@/components/ui/buttons/Button";
-import StyledLink from "@/components/ui/links/StyledLink";
-import AuthLayout from "../login/components/AuthLayout";
+import { Input, Button, StyledLink } from "@/components/ui";
+import { authService } from "@/features/Auth/services/authService";
 
 const DEFAULT_COOLDOWN = 60; // seconds, only for initial UX; server is authoritative
 
@@ -15,6 +13,7 @@ export default function ForgotPassword() {
   const [cooldown, setCooldown] = useState(0);
   const timerRef = useRef(null);
   const [info, setInfo] = useState("");
+  const [error, setError] = useState("");
 
   // countdown
   useEffect(() => {
@@ -36,49 +35,74 @@ export default function ForgotPassword() {
     e?.preventDefault?.();
     setBusy(true);
     setInfo("");
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-passwor`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    setBusy(false);
-    setSent(true);
-    setCooldown(DEFAULT_COOLDOWN); // UX only; server enforces real cooldown on resend
-    setInfo("If an account exists, a reset link has been sent.");
+    setError("");
+
+    try {
+      // Use authService instead of direct fetch
+      const result = await authService.forgotPassword(email);
+
+      setBusy(false);
+      setSent(true);
+      setCooldown(DEFAULT_COOLDOWN);
+
+      if (result.success) {
+        setInfo(
+          result.message || "If an account exists, a reset link has been sent."
+        );
+      } else {
+        // Don't expose whether account exists or not for security
+        setInfo("If an account exists, a reset link has been sent.");
+      }
+    } catch (err) {
+      setBusy(false);
+      setError("Failed to send reset email. Please try again.");
+    }
   }
 
   async function resend() {
     if (!email || cooldown > 0) return;
     setBusy(true);
     setInfo("");
-    const res = await fetch("/api/auth/forgot-password/resend", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email }),
-    }).then((r) => r.json());
-    setBusy(false);
+    setError("");
 
-    const msLeft = Number(res?.cooldownMsLeft || 0);
-    if (msLeft > 0) {
-      setCooldown(Math.ceil(msLeft / 1000));
-    } else {
-      setCooldown(DEFAULT_COOLDOWN);
-    }
+    try {
+      let result;
 
-    if (res?.resent) {
-      setInfo("A reset email was sent. Please check your inbox.");
-    } else {
-      setInfo(
-        `Please wait ${Math.ceil(
-          (res?.cooldownMsLeft ?? 0) / 1000
-        )}s before resending.`
-      );
+      // Use authService resendForgotPassword if available, otherwise fallback
+      if (authService.resendForgotPassword) {
+        result = await authService.resendForgotPassword(email);
+      }
+
+      setBusy(false);
+
+      if (result.success) {
+        const msLeft = Number(result.cooldownMsLeft || 0);
+        if (msLeft > 0) {
+          setCooldown(Math.ceil(msLeft / 1000));
+        } else {
+          setCooldown(DEFAULT_COOLDOWN);
+        }
+
+        if (result.resent) {
+          setInfo("A reset email was sent. Please check your inbox.");
+        } else {
+          setInfo(
+            `Please wait ${Math.ceil(
+              (result.cooldownMsLeft ?? 0) / 1000
+            )}s before resending.`
+          );
+        }
+      } else {
+        setError(result.error || "Failed to resend email. Please try again.");
+      }
+    } catch (err) {
+      setBusy(false);
+      setError("Failed to resend email. Please try again.");
     }
   }
 
   return (
     <div className="flex h-screen justify-center items-center">
-      <AuthLayout />
       <div
         className="lg:w-[600px] lg:px-10 lg:py-20 space-6 bg-black/10 shadow-2xl border-1 w border-[var(--border)] rounded-4xl space-y-5
       zoomInLess
@@ -91,7 +115,7 @@ export default function ForgotPassword() {
           <p className="mt-2 text-sm text-gray-400">
             {sent
               ? "Follow the link we sent to reset your password."
-              : "Enter your email and we’ll send you a reset link."}
+              : "Enter your email and we'll send you a reset link."}
           </p>
         </div>
 
@@ -109,6 +133,7 @@ export default function ForgotPassword() {
             </Button>
 
             {info && <div className="text-xs text-green-700">{info}</div>}
+            {error && <div className="text-xs text-red-600">{error}</div>}
           </form>
         ) : (
           <div className="space-y-6 text-center">
@@ -133,6 +158,7 @@ export default function ForgotPassword() {
 
             <Button onClick={() => setSent(false)}>Try another email</Button>
             {info && <p className="text-xs text-green-400">{info}</p>}
+            {error && <p className="text-xs text-red-400">{error}</p>}
           </div>
         )}
         <div className="mt-6 text-center text-sm">

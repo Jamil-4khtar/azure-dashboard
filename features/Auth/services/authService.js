@@ -69,6 +69,21 @@ export const authService = {
       return { success: false, error: error.message };
     }
   },
+  async resendForgotPassword(email) {
+    try {
+      const response = await post(API_ENDPOINTS.AUTH.FORGOT_RESEND_PASS, {
+        email,
+      });
+      return {
+        success: true,
+        message: response.message,
+        cooldownMsLeft: response.cooldownMsLeft,
+        resent: response.resent,
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
 
   logout() {
     Cookies.remove("auth-token");

@@ -1,7 +1,6 @@
 import { useRegister } from "../hooks/useRegister";
-import Input from "@/components/ui/inputs/Input";
-import Button from "@/components/ui/buttons/Button";
-import { useToast } from "@/components/ui/Toast/ToastProvider";
+import { Input, Button } from "@/components/ui";
+import { useToast } from "@/components/ui/Toast";
 
 export default function RegisterForm() {
   const {

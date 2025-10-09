@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-function AuthLayout() {
+function DashboardBg() {
   return (
     <div className="inset-0 fixed z-[-999]">
       <div
@@ -18,4 +18,4 @@ function AuthLayout() {
   );
 }
 
-export default AuthLayout;
+export default DashboardBg;
