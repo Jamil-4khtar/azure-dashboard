@@ -25,13 +25,14 @@ export function useLogin() {
 
     try {
       const result = await authService.login(email, password);
+			console.log(result)
       if (result.success) {
         updateUser(result.user); // Update global state
         router.push(callbackUrl);
       } else {
         const errorMsg = result.error?.includes("ACCOUNT_DISABLED")
           ? "Your account is disabled. Contact an admin."
-          : "Invalid credentials";
+          : result.error;
         setError(errorMsg);
       }
     } catch (err) {
